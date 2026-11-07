@@ -221,9 +221,9 @@
   .teachers-scene { padding: 82px 20px 105px; }
   .teachers-scene .section-intro { margin-bottom: 28px; }
   .teacher-layout { grid-template-columns: 1fr; gap: 10px; }
-  .teacher-art { min-height: 250px; height: 270px; }
-  .teacher-art .floral-illustration { height: 100%; }
-  .teacher-art span { right: 4%; bottom: 4%; }
+  .teacher-art { min-height: 190px; height: 190px; }
+  .teacher-art .floral-illustration { width: min(68%, 190px); height: 100%; }
+  .teacher-art span { right: 4%; bottom: 5%; font-size: 11px; }
   .teacher-card { grid-template-columns: 26px 1fr 20px; min-height: 72px; gap: 12px; padding: 10px 13px; }
   .teacher-card h3 { font-size: 15px; }
   .korean-scene { grid-template-columns: 1fr; padding: 72px 20px 100px; }
