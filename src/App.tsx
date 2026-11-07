@@ -181,20 +181,52 @@ function App() {
   const [activeSection, setActiveSection] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMessageTyping, setIsMessageTyping] = useState(false)
+  const [isSectionTransitioning, setIsSectionTransitioning] = useState(false)
   const slideDuration = 8
   const [musicEnabled, setMusicEnabled] = useState(false)
   const [notice, setNotice] = useState('')
   const audioRef = useRef<HTMLAudioElement>(null)
   const musicFallbackAttempted = useRef(false)
+  const scrollFrameRef = useRef<number | null>(null)
 
   const goToSection = (index: number, automatic = false) => {
     const nextIndex = Math.max(0, Math.min(sections.length - 1, index))
     if (!automatic) setIsPlaying(false)
     setActiveSection(nextIndex)
-    document.getElementById(sections[nextIndex])?.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-      block: 'start',
-    })
+    if (scrollFrameRef.current !== null) {
+      window.cancelAnimationFrame(scrollFrameRef.current)
+      scrollFrameRef.current = null
+    }
+
+    const section = document.getElementById(sections[nextIndex])
+    if (!section) return
+
+    const start = window.scrollY
+    const target = section.getBoundingClientRect().top + start
+    const distance = target - start
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(distance) < 2) {
+      window.scrollTo({ top: target, behavior: 'instant' })
+      setIsSectionTransitioning(false)
+      return
+    }
+
+    setIsSectionTransitioning(true)
+    const startedAt = performance.now()
+    const duration = Math.min(1400, Math.max(700, Math.abs(distance) * 0.35))
+    const animateScroll = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1)
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2
+      window.scrollTo({ top: start + distance * eased, behavior: 'instant' })
+      if (progress < 1) {
+        scrollFrameRef.current = window.requestAnimationFrame(animateScroll)
+      } else {
+        scrollFrameRef.current = null
+        setIsSectionTransitioning(false)
+      }
+    }
+    scrollFrameRef.current = window.requestAnimationFrame(animateScroll)
   }
 
   const startMusic = async () => {
@@ -266,7 +298,7 @@ function App() {
   }, [isOpen])
 
   useEffect(() => {
-    if (!isOpen || !isPlaying || isMessageTyping) return
+    if (!isOpen || !isPlaying || isMessageTyping || isSectionTransitioning) return
     const timeout = window.setTimeout(() => {
       if (activeSection >= sections.length - 1) {
         setIsPlaying(false)
@@ -275,12 +307,17 @@ function App() {
       }
     }, slideDuration * 1000)
     return () => window.clearTimeout(timeout)
-  }, [activeSection, isMessageTyping, isOpen, isPlaying, slideDuration])
+  }, [activeSection, isMessageTyping, isOpen, isPlaying, isSectionTransitioning, slideDuration])
 
   useEffect(() => {
     if (!isOpen || !isPlaying) return
     const pauseOnInput = (event: Event) => {
       if (!(event.target instanceof Element) || !event.target.closest('.presentation-bar')) {
+        if (scrollFrameRef.current !== null) {
+          window.cancelAnimationFrame(scrollFrameRef.current)
+          scrollFrameRef.current = null
+          setIsSectionTransitioning(false)
+        }
         setIsPlaying(false)
       }
     }
@@ -364,7 +401,7 @@ function App() {
       <motion.main className={isOpen ? 'journey is-open' : 'journey'} animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}>
         <section className="scene hero-scene" id="opening-greeting" aria-label="감사 인사">
           <motion.div className="hero-glow" aria-hidden="true" animate={shouldReduceMotion ? undefined : { scale: [1, 1.025, 1], opacity: [0.65, 1, 0.65] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
-          <motion.div className="hero-copy" initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.div className="hero-copy" initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.3 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
             <p className="eyebrow"><span /> 11월 20일 · 감사와 사랑의 날 <span /></p>
             <h1>감사의 마음을<br /><em>전하는 스승의 날</em></h1>
             <p className="hero-subtitle">오늘, 선생님께 감사의 마음을 전합니다</p>
@@ -372,7 +409,7 @@ function App() {
           <motion.a className="scroll-cue" href="#gratitude-message" aria-label="감사 편지 보기">
             <span>감사와 존경을 담아</span><i />
           </motion.a>
-          <motion.div ref={heroArtRef} className="hero-art" aria-hidden="true" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94, y: 18 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.div ref={heroArtRef} className="hero-art" aria-hidden="true" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94, y: 18 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ amount: 0.25 }} transition={{ duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}>
             <motion.div className="art-halo" animate={shouldReduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.55, 0.85, 0.55] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} />
             <motion.div className="hero-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -9, 0], rotate: [0, 0.8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}>
               <HeroFlower style={{ x: shouldReduceMotion ? 0 : heroFlowerX, y: shouldReduceMotion ? 0 : heroFlowerY, scale: shouldReduceMotion ? 1 : heroFlowerScale }} />
@@ -383,11 +420,11 @@ function App() {
         </section>
 
         <section className="scene letter-scene" id="gratitude-message" lang="ko">
-          <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8 }}>
+          <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.25 }} transition={{ duration: 0.8 }}>
             <p className="eyebrow"><span /> 사랑하는 선생님께 <span /></p>
             <h2>감사의 한마디,<br /><em>가득 담은 사랑.</em></h2>
           </motion.div>
-          <motion.article className="letter-card" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, amount: 0.18 }} transition={{ duration: 0.9, delay: 0.12 }}>
+          <motion.article className="letter-card" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ amount: 0.18 }} transition={{ duration: 0.9, delay: 0.12 }}>
             <div className="letter-top"><span>11월 20일</span><Flower2 className="letter-flower" aria-hidden="true" /><span>감사한 마음을 담아</span></div>
             <TypingMessage
               className="letter-copy"
@@ -404,13 +441,13 @@ function App() {
         </section>
 
         <section className="scene teachers-scene" id="teachers" lang="ko">
-          <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8 }}>
+          <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.25 }} transition={{ duration: 0.8 }}>
             <p className="eyebrow"><span /> 우리에게 영감을 주신 분들 <span /></p>
             <h2>지식의 정원에 핀<br /><em>소중한 꽃들.</em></h2>
             <p className="section-note">선생님께 진심 어린 감사의 마음을 전합니다.</p>
           </motion.div>
           <div className="teacher-layout">
-            <motion.div ref={teacherArtRef} className="teacher-art" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.9 }}>
+            <motion.div ref={teacherArtRef} className="teacher-art" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ amount: 0.2 }} transition={{ duration: 0.9 }}>
               <motion.div className="teacher-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -8, 0], rotate: [0, 1.2, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}>
                 <Bouquet label="감사의 꽃다발" style={{ x: shouldReduceMotion ? 0 : teacherFlowerX, y: shouldReduceMotion ? 0 : teacherFlowerY, scale: shouldReduceMotion ? 1 : teacherFlowerScale }} />
               </motion.div>
@@ -418,7 +455,7 @@ function App() {
             </motion.div>
             <div className="teacher-list">
               {teachers.map((teacher, index) => (
-                <motion.article className="teacher-card" key={teacher.name} initial={shouldReduceMotion ? false : { opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.25 }} whileHover={shouldReduceMotion ? undefined : { x: 5, scale: 1.01 }} transition={{ duration: 0.45, delay: index * 0.08 }}>
+                <motion.article className="teacher-card" key={teacher.name} initial={shouldReduceMotion ? false : { opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ amount: 0.25 }} whileHover={shouldReduceMotion ? undefined : { x: 5, scale: 1.01 }} transition={{ duration: 0.45, delay: index * 0.08 }}>
                   <span className="teacher-index">{teacher.number}</span>
                   <div><span className="teacher-title">{teacher.title}</span><h3>{teacher.name}</h3></div>
                   <Sparkles className="teacher-star" aria-hidden="true" />
@@ -446,15 +483,15 @@ function App() {
         </section>
 
         <section className="scene korean-scene" id="korean-message">
-          <motion.div ref={koreanArtRef} className="korean-art" aria-hidden="true" initial={shouldReduceMotion ? false : { opacity: 0, x: -28 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.9 }}>
+          <motion.div ref={koreanArtRef} className="korean-art" aria-hidden="true" initial={shouldReduceMotion ? false : { opacity: 0, x: -28 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ amount: 0.2 }} transition={{ duration: 0.9 }}>
             <motion.div className="korean-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -7, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}>
               <SakuraSprig style={{ x: shouldReduceMotion ? 0 : koreanFlowerX, y: shouldReduceMotion ? 0 : koreanFlowerY, scale: shouldReduceMotion ? 1 : koreanFlowerScale, rotate: shouldReduceMotion ? -15 : koreanFlowerRotate }} />
             </motion.div>
           </motion.div>
-          <motion.div className="korean-content" initial={shouldReduceMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.8 }}>
+          <motion.div className="korean-content" initial={shouldReduceMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.2 }} transition={{ duration: 0.8 }}>
             <p className="eyebrow"><span /> 마음을 담아 <span /></p>
             <h2 lang="ko">감사와 존경의<br /><em>마음을 전합니다</em></h2>
-            <motion.article className="korean-letter" lang="ko" initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.8, delay: 0.15 }}>
+            <motion.article className="korean-letter" lang="ko" initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.15 }} transition={{ duration: 0.8, delay: 0.15 }}>
               <TypingMessage
                 paragraphs={koreanMessage}
                 lang="ko"
@@ -468,7 +505,7 @@ function App() {
         </section>
 
         <section className="scene finale-scene" id="finale">
-          <motion.div className="finale-content" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.97 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 1 }}>
+          <motion.div className="finale-content" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.97 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ amount: 0.25 }} transition={{ duration: 1 }}>
             <p className="eyebrow"><span /> 사랑과 감사의 마음을 담아 <span /></p>
             <div className="finale-bloom" ref={finaleArtRef}>
               <motion.div className="finale-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -9, 0], rotate: [0, -0.8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
@@ -512,7 +549,15 @@ function App() {
             <h1>스승의 날<br /><em>감사와 사랑을 담아</em></h1>
             <p className="opening-date">11월 20일</p>
             <p className="opening-caption">언제나 우리의 영감이 되어 주신 선생님, 감사합니다.</p>
-            <motion.button className="open-button" onClick={openCard} disabled={isOpening} whileHover={shouldReduceMotion || isOpening ? undefined : { y: -3, scale: 1.04 }} whileTap={shouldReduceMotion || isOpening ? undefined : { scale: 0.96 }} transition={{ type: 'spring', stiffness: 350, damping: 20 }}>{isOpening ? '편지를 여는 중' : '편지 열기'} <ArrowUpRight aria-hidden="true" /></motion.button>
+            <motion.button
+              className="open-button whitespace-nowrap flex items-center gap-2"
+              onClick={openCard}
+              disabled={isOpening}
+              animate={{ opacity: isOpening ? 0 : 1 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+            >
+              편지 열기<ArrowUpRight aria-hidden="true" />
+            </motion.button>
             <p className="opening-signoff">사랑과 감사의 마음으로</p>
           </motion.div>
         </motion.div>
