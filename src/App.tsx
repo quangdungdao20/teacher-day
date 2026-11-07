@@ -8,16 +8,16 @@ import { backgroundMusicFallbackUrl, backgroundMusicUrl, backgroundMusicTitle } 
 const sections = ['opening-greeting', 'gratitude-message', 'teachers', 'korean-message', 'finale']
 
 const teachers = [
-  { number: '04', title: '선생님', name: 'OH SU YEAN' },
-  { number: '05', title: '선생님', name: 'LEE YONG SIK' },
-  { number: '01', title: '선생님', name: 'PARK MIYOUNG' },
-  { number: '02', title: '선생님', name: 'CHANG MINHEE' },
-  { number: '03', title: '선생님', name: 'SEOK SUK HEE' },
+  { number: '04', title: '교수님', name: 'OH SU YEAN' },
+  { number: '05', title: '교수님', name: 'LEE YONG SIK' },
+  { number: '01', title: '교수님', name: 'PARK MIYOUNG' },
+  { number: '02', title: '교수님', name: 'CHANG MINHEE' },
+  { number: '03', title: '교수님', name: 'SEOK SUK HEE' },
 ]
 
 const gratitudeMessage = [
-  '베트남 스승의 날 11월 20일을 맞아, 우리 반 학생들을 대표하여 선생님께 진심 어린 축하와 깊은 감사의 마음을 전합니다.',
-  '소중한 지식을 아낌없이 가르쳐 주시고, 늘 따뜻한 마음으로 이끌어 주셔서 감사합니다. 선생님의 격려와 믿음은 우리가 매일 더 배우고 성장할 수 있는 큰 힘이 되었습니다.',
+  '베트남 스승의 날 11월 20일을 맞아, 우리 반 학생들을 대표하여 교수님께 진심 어린 축하와 깊은 감사의 마음을 전합니다.',
+  '소중한 지식을 아낌없이 가르쳐 주시고, 늘 따뜻한 마음으로 이끌어 주셔서 감사합니다. 교수님의 격려와 믿음은 우리가 매일 더 배우고 성장할 수 있는 큰 힘이 되었습니다.',
   '언제나 건강하고 행복하시며 하시는 모든 일에 기쁨과 성공이 함께하기를 바랍니다. 변함없는 열정으로 앞으로도 많은 제자에게 꿈과 희망을 전해 주세요.',
   '진심으로 감사드리며, 늘 존경하고 사랑합니다! ❤️🌷',
 ]
@@ -404,7 +404,7 @@ function App() {
           <motion.div className="hero-copy" initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.3 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
             <p className="eyebrow"><span /> 11월 20일 · 감사와 사랑의 날 <span /></p>
             <h1>감사의 마음을<br /><em>전하는 스승의 날</em></h1>
-            <p className="hero-subtitle">오늘, 선생님께 감사의 마음을 전합니다</p>
+            <p className="hero-subtitle">오늘, 교수님께 감사의 마음을 전합니다</p>
           </motion.div>
           <motion.a className="scroll-cue" href="#gratitude-message" aria-label="감사 편지 보기">
             <span>감사와 존경을 담아</span><i />
@@ -421,7 +421,7 @@ function App() {
 
         <section className="scene letter-scene" id="gratitude-message" lang="ko">
           <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.25 }} transition={{ duration: 0.8 }}>
-            <p className="eyebrow"><span /> 사랑하는 선생님께 <span /></p>
+            <p className="eyebrow"><span /> 사랑하는 교수님께 <span /></p>
             <h2>감사의 한마디,<br /><em>가득 담은 사랑.</em></h2>
           </motion.div>
           <motion.article className="letter-card" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ amount: 0.18 }} transition={{ duration: 0.9, delay: 0.12 }}>
@@ -444,7 +444,7 @@ function App() {
           <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.25 }} transition={{ duration: 0.8 }}>
             <p className="eyebrow"><span /> 우리에게 영감을 주신 분들 <span /></p>
             <h2>지식의 정원에 핀<br /><em>소중한 꽃들.</em></h2>
-            <p className="section-note">선생님께 진심 어린 감사의 마음을 전합니다.</p>
+            <p className="section-note">교수님께 진심 어린 감사의 마음을 전합니다.</p>
           </motion.div>
           <div className="teacher-layout">
             <motion.div ref={teacherArtRef} className="teacher-art" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ amount: 0.2 }} transition={{ duration: 0.9 }}>
@@ -464,18 +464,18 @@ function App() {
             </div>
           </div>
           <div className="teacher-moments">
-            <h3>선생님과 함께한 소중한 순간</h3>
+            <h3>교수님과 함께한 소중한 순간</h3>
             <div className="teacher-gallery">
               <figure>
-                <img src="/image/1.jpg" alt="선생님 인물 사진" loading="lazy" />
-                <figcaption>따뜻한 미소로 함께해 주신 선생님</figcaption>
+                <img src="/image/1.jpg" alt="교수님 인물 사진" loading="lazy" />
+                <figcaption>따뜻한 미소로 함께해 주신 교수님</figcaption>
               </figure>
               <figure>
-                <img src="/image/2.jpg" alt="선생님들과 함께한 단체 사진" loading="lazy" />
+                <img src="/image/2.jpg" alt="교수님들과 함께한 단체 사진" loading="lazy" />
                 <figcaption>함께여서 더욱 빛나는 순간</figcaption>
               </figure>
               <figure>
-                <img src="/image/3.jpg" alt="한국어 행사에서 선생님들과 함께한 모습" loading="lazy" />
+                <img src="/image/3.jpg" alt="한국어 행사에서 교수님들과 함께한 모습" loading="lazy" />
                 <figcaption>오래도록 간직할 감사의 추억</figcaption>
               </figure>
             </div>
@@ -509,10 +509,10 @@ function App() {
             <p className="eyebrow"><span /> 사랑과 감사의 마음을 담아 <span /></p>
             <div className="finale-bloom" ref={finaleArtRef}>
               <motion.div className="finale-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -9, 0], rotate: [0, -0.8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
-                <Bouquet label="선생님께 드리는 감사의 꽃다발" style={{ x: shouldReduceMotion ? 0 : finaleFlowerX, y: shouldReduceMotion ? 0 : finaleFlowerY, scale: shouldReduceMotion ? 1 : finaleFlowerScale }} />
+                <Bouquet label="교수님께 드리는 감사의 꽃다발" style={{ x: shouldReduceMotion ? 0 : finaleFlowerX, y: shouldReduceMotion ? 0 : finaleFlowerY, scale: shouldReduceMotion ? 1 : finaleFlowerScale }} />
               </motion.div>
             </div>
-            <h2>선생님, 감사합니다<br /><em>늘 존경하고 사랑합니다</em></h2>
+            <h2>교수님, 감사합니다<br /><em>늘 존경하고 사랑합니다</em></h2>
             <p className="final-date">11월 20일</p>
             <p className="final-thanks">언제나 우리의 큰 힘이 되어 주셔서 감사합니다.<br />사랑과 존경을 담아.</p>
             <motion.button className="replay-button" onClick={() => goToSection(0)} whileHover={shouldReduceMotion ? undefined : { y: -3, scale: 1.03 }} whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }} transition={{ type: 'spring', stiffness: 360, damping: 22 }}><RotateCcw aria-hidden="true" /><span>처음부터 다시 보기</span></motion.button>
@@ -548,7 +548,7 @@ function App() {
             <p className="eyebrow"><span /> 사랑과 존경을 담아 <span /></p>
             <h1>스승의 날<br /><em>감사와 사랑을 담아</em></h1>
             <p className="opening-date">11월 20일</p>
-            <p className="opening-caption">언제나 우리의 영감이 되어 주신 선생님, 감사합니다.</p>
+            <p className="opening-caption">언제나 우리의 영감이 되어 주신 교수님, 감사합니다.</p>
             <motion.button
               className="open-button whitespace-nowrap flex items-center gap-2"
               onClick={openCard}
