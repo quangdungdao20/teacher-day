@@ -179,7 +179,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [activeSection, setActiveSection] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
   const [isMessageTyping, setIsMessageTyping] = useState(false)
   const [isSectionTransitioning, setIsSectionTransitioning] = useState(false)
   const slideDuration = 8
