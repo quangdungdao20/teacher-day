@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion'
-import { ArrowUpRight, Flower2, Maximize, Music2, Pause, Play, RotateCcw, Sparkles } from 'lucide-react'
+import { ArrowUpRight, ChevronLeft, ChevronRight, Flower2, Maximize, Music2, Pause, Play, RotateCcw, Sparkles } from 'lucide-react'
 import { Bouquet, HeroFlower, SakuraSprig } from './components/FlowerIllustrations'
 import './App.css'
 import { backgroundMusicFallbackUrl, backgroundMusicUrl, backgroundMusicTitle } from './config/music'
@@ -566,15 +566,11 @@ function App() {
 
       {isOpen && (
         <nav className="presentation-bar" aria-label="편지 장면 제어">
-          <button className="control-icon" onClick={() => goToSection(activeSection - 1)} aria-label="이전 장면" title="이전 장면">‹</button>
+          <button className="control-icon" onClick={() => goToSection(activeSection - 1)} aria-label="이전 장면" title="이전 장면"><ChevronLeft aria-hidden="true" /></button>
           <button className="play-control" onClick={() => setIsPlaying((playing) => !playing)} aria-label={isPlaying ? '자동 재생 일시 정지' : '자동 재생 시작'} title={isPlaying ? '일시 정지' : '자동 재생'}>
             {isPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
           </button>
-          <button className="control-icon" onClick={() => goToSection(activeSection + 1)} aria-label="다음 장면" title="다음 장면">›</button>
-          <div className="progress-wrap" aria-label={`${sections.length}개 장면 중 ${activeSection + 1}번째`}>
-            <div className="progress-track"><span style={{ width: `${((activeSection + 1) / sections.length) * 100}%` }} /></div>
-            <span className="progress-count">0{activeSection + 1} / 0{sections.length}</span>
-          </div>
+          <button className="control-icon" onClick={() => goToSection(activeSection + 1)} aria-label="다음 장면" title="다음 장면"><ChevronRight aria-hidden="true" /></button>
           <button className={musicEnabled ? 'control-icon music-control is-active' : 'control-icon music-control'} onClick={() => void toggleMusic()} aria-label={musicEnabled ? '음악 끄기' : '음악 켜기'} title={backgroundMusicTitle}><Music2 aria-hidden="true" /></button>
           <button className="control-icon" onClick={() => void toggleFullscreen()} aria-label="전체 화면 전환" title="전체 화면"><Maximize aria-hidden="true" /></button>
           <button className="control-icon restart-control" onClick={() => { setIsPlaying(false); goToSection(0) }} aria-label="처음부터 다시 보기" title="처음부터"><RotateCcw aria-hidden="true" /></button>

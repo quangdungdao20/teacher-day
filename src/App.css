@@ -176,16 +176,13 @@
 .open-button svg { width: 15px; height: 15px; margin: 0 0 -3px 14px; }
 .open-button:hover { background: #a96970; }
 
-.presentation-bar { position: fixed; z-index: 25; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 9px; width: min(calc(100% - 32px), 540px); min-height: 54px; padding: 8px 13px; border: 1px solid rgba(213,190,169,.65); border-radius: 4px; background: rgba(255,252,248,.91); box-shadow: 0 10px 30px rgba(86,61,56,.12); backdrop-filter: blur(14px); transform: translateX(-50%); }
-.control-icon, .play-control { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; padding: 0; border: 0; background: transparent; color: #846b69; cursor: pointer; font-size: 17px; }
+.presentation-bar { position: fixed; z-index: 25; top: max(10px, env(safe-area-inset-top)); right: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; width: max-content; min-height: 30px; padding: 0; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+.control-icon, .play-control { display: grid; place-items: center; flex: 0 0 27px; width: 27px; height: 27px; padding: 0; border: 0; background: transparent; color: #846b69; cursor: pointer; font-size: 17px; }
 .control-icon:hover, .control-icon.is-active { color: #ae6e76; }
-.control-icon svg, .play-control svg { width: 16px; height: 16px; stroke-width: 1.8; }
-.play-control { flex-basis: 33px; width: 33px; height: 33px; border: 1px solid rgba(181,128,127,.56); border-radius: 50%; color: #a36d70; font-size: 11px; }
-.play-control svg { width: 13px; height: 13px; }
-.progress-wrap { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; flex: 1; min-width: 56px; padding: 0 5px; }
-.progress-track { height: 2px; background: #ebded6; }
-.progress-track span { display: block; height: 100%; background: #ba8581; transition: width .6s ease; }
-.progress-count { color: #9b8582; font-size: 8px; letter-spacing: .08em; white-space: nowrap; }
+.control-icon svg, .play-control svg { width: 15px; height: 15px; stroke-width: 1.8; }
+.play-control { flex-basis: 27px; width: 27px; height: 27px; border: 0; border-radius: 0; background: transparent; color: #a36d70; font-size: 11px; }
+.play-control:hover { color: #ae6e76; }
+.play-control svg { width: 14px; height: 14px; }
 .notice { position: fixed; z-index: 40; bottom: 92px; left: 50%; max-width: calc(100vw - 32px); padding: 12px 18px; border: 1px solid rgba(213,190,169,.7); background: rgba(255,252,248,.96); color: #755e60; font-size: 12px; text-align: center; box-shadow: 0 8px 25px rgba(86,61,56,.12); transform: translateX(-50%); }
 
 @keyframes branch-sway { 0%, 100% { transform: rotate(11deg); } 50% { transform: rotate(18deg); } }
@@ -256,11 +253,9 @@
   .opening-caption { top: 76%; font-size: 11px; }
   .open-button { top: 84%; padding: 10px 24px; font-size: 11px; }
   .opening-signoff { bottom: 2%; font-size: 7px; }
-  .presentation-bar { gap: 2px; min-height: 42px; padding: 5px 7px; width: calc(100% - 24px); }
-  .control-icon { flex-basis: 25px; width: 25px; height: 27px; font-size: 14px; }
-  .play-control { flex-basis: 28px; width: 28px; height: 28px; }
-  .progress-wrap { gap: 5px; padding: 0 2px; }
-  .restart-control { margin-left: -2px; }
+  .presentation-bar { top: max(8px, env(safe-area-inset-top)); right: 8px; gap: 1px; min-height: 27px; }
+  .control-icon, .play-control { flex-basis: 25px; width: 25px; height: 25px; }
+  .control-icon svg { width: 14px; height: 14px; }
 }
 
 @media (max-width: 360px) {
@@ -269,7 +264,6 @@
   .opening-flower { width: 70vw; }
   .opening-card h1 { font-size: 30px; }
   .opening-caption { font-size: 10px; }
-  .presentation-bar { gap: 0; padding-right: 4px; padding-left: 4px; }
-  .control-icon { flex-basis: 23px; width: 23px; }
-  .progress-count { font-size: 7px; }
+  .presentation-bar { right: 6px; gap: 0; }
+  .control-icon, .play-control { flex-basis: 23px; width: 23px; }
 }
