@@ -1,24 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { ArrowUpRight, Flower2, Maximize, Music2, Pause, Play, RotateCcw, Sparkles } from 'lucide-react'
 import { Bouquet, HeroFlower, SakuraSprig } from './components/FlowerIllustrations'
 import './App.css'
 import { backgroundMusicFallbackUrl, backgroundMusicUrl, backgroundMusicTitle } from './config/music'
 
-const sections = ['opening-greeting', 'vietnamese-message', 'teachers', 'korean-message', 'finale']
+const sections = ['opening-greeting', 'gratitude-message', 'teachers', 'korean-message', 'finale']
 
 const teachers = [
-  { title: 'Cô', name: 'PARK MIYOUNG' },
-  { title: 'Cô', name: 'CHANG MINHEE' },
-  { title: 'Cô', name: 'SEOK SUK HEE' },
-  { title: 'Cô', name: 'OH SU YEAN' },
-  { title: 'Thầy', name: 'LEE YONG SIK' },
+  { number: '04', title: '선생님', name: 'OH SU YEAN' },
+  { number: '05', title: '선생님', name: 'LEE YONG SIK' },
+  { number: '01', title: '선생님', name: 'PARK MIYOUNG' },
+  { number: '02', title: '선생님', name: 'CHANG MINHEE' },
+  { number: '03', title: '선생님', name: 'SEOK SUK HEE' },
 ]
 
-const vietnameseMessage = [
-  'Nhân ngày Nhà giáo Việt Nam 20/11, thay mặt toàn thể các bạn trong lớp, chúng em xin gửi đến thầy/cô lời chúc mừng cùng lòng biết ơn chân thành và sâu sắc nhất.',
-  'Chúng em xin chân thành cảm ơn thầy/cô vì đã luôn tận tâm truyền đạt những kiến thức quý báu, kiên nhẫn hướng dẫn và đồng hành cùng chúng em trong suốt quá trình học tập. Không chỉ là người truyền đạt kiến thức, thầy/cô còn mang đến cho chúng em sự động viên, niềm tin và nguồn cảm hứng để không ngừng cố gắng và trưởng thành hơn mỗi ngày.',
-  'Nhân ngày đặc biệt này, chúng em kính chúc thầy/cô luôn mạnh khỏe, hạnh phúc và thành công. Mong rằng thầy/cô sẽ luôn giữ vững ngọn lửa nhiệt huyết với nghề và tiếp tục truyền cảm hứng đến thật nhiều thế hệ học trò.',
-  'Chúng em xin chân thành cảm ơn và luôn kính trọng thầy/cô! ❤️🌷',
+const gratitudeMessage = [
+  '베트남 스승의 날 11월 20일을 맞아, 우리 반 학생들을 대표하여 선생님께 진심 어린 축하와 깊은 감사의 마음을 전합니다.',
+  '소중한 지식을 아낌없이 가르쳐 주시고, 늘 따뜻한 마음으로 이끌어 주셔서 감사합니다. 선생님의 격려와 믿음은 우리가 매일 더 배우고 성장할 수 있는 큰 힘이 되었습니다.',
+  '언제나 건강하고 행복하시며 하시는 모든 일에 기쁨과 성공이 함께하기를 바랍니다. 변함없는 열정으로 앞으로도 많은 제자에게 꿈과 희망을 전해 주세요.',
+  '진심으로 감사드리며, 늘 존경하고 사랑합니다! ❤️🌷',
 ]
 
 const koreanMessage = [
@@ -29,23 +30,23 @@ const koreanMessage = [
   '교수님, 진심으로 존경하고 감사드립니다.\n항상 건강하시고 행복하세요! ❤️🌷',
 ]
 
-const petals = Array.from({ length: 72 }, (_, index) => ({
+const petals = Array.from({ length: 36 }, (_, index) => ({
   left: `${(index * 37 + 7) % 100}%`,
-  delay: `${(index % 18) * -0.8}s`,
+  delay: `${(index % 12) * -1.2}s`,
   duration: `${10 + (index % 8) * 1.4}s`,
   size: `${5 + (index % 4) * 2}px`,
 }))
 
-const blossoms = Array.from({ length: 14 }, (_, index) => ({
+const blossoms = Array.from({ length: 7 }, (_, index) => ({
   left: `${(index * 43 + 19) % 100}%`,
   delay: `${(index % 7) * -1.8}s`,
   duration: `${15 + (index % 4) * 2}s`,
   size: `${9 + (index % 3) * 3}px`,
 }))
 
-const openingPetals = Array.from({ length: 24 }, (_, index) => ({
+const openingPetals = Array.from({ length: 12 }, (_, index) => ({
   left: `${(index * 41 + 3) % 100}%`,
-  delay: `${(index % 12) * -1.1}s`,
+  delay: `${(index % 6) * -2.1}s`,
   duration: `${11 + (index % 4) * 1.5}s`,
   size: `${5 + (index % 4) * 2}px`,
 }))
@@ -56,6 +57,89 @@ const sparkles = Array.from({ length: 14 }, (_, index) => ({
   delay: `${(index % 7) * -0.8}s`,
   duration: `${2.8 + (index % 4) * 0.7}s`,
 }))
+
+function TypingMessage({ paragraphs, className, finalParagraphClassName, lang, reduceMotion, nextSectionId, onTypingChange }: {
+  paragraphs: string[]
+  className?: string
+  finalParagraphClassName?: string
+  lang?: string
+  reduceMotion: boolean | null
+  nextSectionId: string
+  onTypingChange: (isTyping: boolean) => void
+}) {
+  const messageRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(messageRef, { once: true, amount: 0.15 })
+  const hasStartedRef = useRef(Boolean(reduceMotion))
+  const [visibleCounts, setVisibleCounts] = useState(() => paragraphs.map((text) => reduceMotion ? Array.from(text).length : 0))
+  const [activeParagraph, setActiveParagraph] = useState(0)
+
+  useEffect(() => {
+    if (!reduceMotion) return
+    setVisibleCounts(paragraphs.map((text) => Array.from(text).length))
+    setActiveParagraph(paragraphs.length)
+  }, [paragraphs, reduceMotion])
+
+  useEffect(() => {
+    if (reduceMotion !== false || !isInView || hasStartedRef.current) return
+
+    hasStartedRef.current = true
+    onTypingChange(true)
+    let paragraphIndex = 0
+    let characterIndex = 0
+    const counts = paragraphs.map(() => 0)
+    let timeout: number
+
+    const typeNextCharacter = () => {
+      if (paragraphIndex >= paragraphs.length) {
+        onTypingChange(false)
+        timeout = window.setTimeout(() => {
+          document.getElementById(nextSectionId)?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          })
+        }, 500)
+        return
+      }
+
+      const characters = Array.from(paragraphs[paragraphIndex])
+      characterIndex += 1
+      counts[paragraphIndex] = characterIndex
+      setVisibleCounts([...counts])
+
+      if (characterIndex >= characters.length) {
+        paragraphIndex += 1
+        characterIndex = 0
+        setActiveParagraph(paragraphIndex)
+        timeout = window.setTimeout(typeNextCharacter, 300)
+      } else {
+        timeout = window.setTimeout(typeNextCharacter, 16)
+      }
+    }
+
+    timeout = window.setTimeout(typeNextCharacter, 300)
+    return () => {
+      window.clearTimeout(timeout)
+      hasStartedRef.current = false
+      onTypingChange(false)
+    }
+  }, [isInView, nextSectionId, onTypingChange, paragraphs, reduceMotion])
+
+  return (
+    <div ref={messageRef} className={className} lang={lang}>
+      {paragraphs.map((text, index) => {
+        const characters = Array.from(text)
+        const isComplete = visibleCounts[index] >= characters.length
+        const isCurrent = isInView && reduceMotion === false && activeParagraph === index
+        return (
+          <p key={text} className={`${index === paragraphs.length - 1 ? finalParagraphClassName ?? '' : ''}${isComplete ? '' : ' is-typing'}`} lang={lang} aria-label={text}>
+            <span aria-hidden="true">{characters.slice(0, visibleCounts[index]).join('')}</span>
+            {!isComplete && isCurrent && <span className="typing-cursor" aria-hidden="true" />}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
 
 function App() {
   const shouldReduceMotion = useReducedMotion()
@@ -96,6 +180,7 @@ function App() {
   const [isOpening, setIsOpening] = useState(false)
   const [activeSection, setActiveSection] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isMessageTyping, setIsMessageTyping] = useState(false)
   const slideDuration = 8
   const [musicEnabled, setMusicEnabled] = useState(false)
   const [notice, setNotice] = useState('')
@@ -114,7 +199,7 @@ function App() {
 
   const startMusic = async () => {
     if (!backgroundMusicUrl) {
-      setNotice('Nhạc nền chưa được cấu hình. Hãy thêm URL vào src/config/music.ts.')
+      setNotice('배경 음악이 설정되지 않았습니다.')
       return
     }
 
@@ -126,7 +211,7 @@ function App() {
       setMusicEnabled(true)
     } catch {
       setMusicEnabled(false)
-      setNotice('Trình duyệt chưa thể phát nhạc. Bạn có thể bật nhạc bằng nút điều khiển.')
+      setNotice('브라우저에서 음악을 재생할 수 없습니다. 음악 버튼을 눌러 다시 시도해 주세요.')
     }
   }
 
@@ -143,7 +228,7 @@ function App() {
   const toggleMusic = async () => {
     const audio = audioRef.current
     if (!backgroundMusicUrl || !audio) {
-      setNotice('Nhạc nền chưa được cấu hình. Hãy thêm URL vào src/config/music.ts.')
+      setNotice('배경 음악이 설정되지 않았습니다.')
       return
     }
     if (musicEnabled) {
@@ -153,13 +238,6 @@ function App() {
     }
     await startMusic()
   }
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? '' : 'hidden'
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
 
   useEffect(() => {
     if (!notice) return
@@ -188,7 +266,7 @@ function App() {
   }, [isOpen])
 
   useEffect(() => {
-    if (!isOpen || !isPlaying) return
+    if (!isOpen || !isPlaying || isMessageTyping) return
     const timeout = window.setTimeout(() => {
       if (activeSection >= sections.length - 1) {
         setIsPlaying(false)
@@ -197,7 +275,7 @@ function App() {
       }
     }, slideDuration * 1000)
     return () => window.clearTimeout(timeout)
-  }, [activeSection, isOpen, isPlaying, slideDuration])
+  }, [activeSection, isMessageTyping, isOpen, isPlaying, slideDuration])
 
   useEffect(() => {
     if (!isOpen || !isPlaying) return
@@ -219,7 +297,7 @@ function App() {
       if (document.fullscreenElement) await document.exitFullscreen()
       else await document.documentElement.requestFullscreen()
     } catch {
-      setNotice('Không thể bật toàn màn hình trên thiết bị này.')
+      setNotice('이 기기에서는 전체 화면을 사용할 수 없습니다.')
     }
   }
 
@@ -284,66 +362,85 @@ function App() {
       </div>}
 
       <motion.main className={isOpen ? 'journey is-open' : 'journey'} animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}>
-        <section className="scene hero-scene" id="opening-greeting" aria-label="Lời chúc mở đầu">
+        <section className="scene hero-scene" id="opening-greeting" aria-label="감사 인사">
           <motion.div className="hero-glow" aria-hidden="true" animate={shouldReduceMotion ? undefined : { scale: [1, 1.025, 1], opacity: [0.65, 1, 0.65] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
           <motion.div className="hero-copy" initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="eyebrow"><span /> 20 · 11 · A DAY TO CELEBRATE <span /></p>
-            <h1>Tri ân những<br /><em>người gieo nắng</em></h1>
-            <p className="hero-subtitle">Nhân ngày Nhà giáo Việt Nam</p>
-            <motion.a className="scroll-cue" href="#vietnamese-message" aria-label="Cuộn đến lời tri ân" whileHover={shouldReduceMotion ? undefined : { x: 8 }} transition={{ duration: 0.25 }}>
-              <span>Cuộn để khám phá</span><i />
-            </motion.a>
+            <p className="eyebrow"><span /> 11월 20일 · 감사와 사랑의 날 <span /></p>
+            <h1>감사의 마음을<br /><em>전하는 스승의 날</em></h1>
+            <p className="hero-subtitle">오늘, 선생님께 감사의 마음을 전합니다</p>
           </motion.div>
+          <motion.a className="scroll-cue" href="#gratitude-message" aria-label="감사 편지 보기">
+            <span>감사와 존경을 담아</span><i />
+          </motion.a>
           <motion.div ref={heroArtRef} className="hero-art" aria-hidden="true" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94, y: 18 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}>
             <motion.div className="art-halo" animate={shouldReduceMotion ? undefined : { scale: [1, 1.06, 1], opacity: [0.55, 0.85, 0.55] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} />
             <motion.div className="hero-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -9, 0], rotate: [0, 0.8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}>
               <HeroFlower style={{ x: shouldReduceMotion ? 0 : heroFlowerX, y: shouldReduceMotion ? 0 : heroFlowerY, scale: shouldReduceMotion ? 1 : heroFlowerScale }} />
             </motion.div>
-            <span className="art-caption">a little garden<br />of gratitude</span>
+            <span className="art-caption">감사와 사랑을 담은<br />작은 꽃 정원</span>
           </motion.div>
-          <span className="side-note">A LETTER OF GRATITUDE</span>
+          <span className="side-note">감사의 마음을 담아</span>
         </section>
 
-        <section className="scene letter-scene" id="vietnamese-message">
+        <section className="scene letter-scene" id="gratitude-message" lang="ko">
           <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8 }}>
-            <p className="eyebrow"><span /> GỬI THẦY CÔ THÂN YÊU <span /></p>
-            <h2>Một lời cảm ơn,<br /><em>ngàn điều thương mến.</em></h2>
+            <p className="eyebrow"><span /> 사랑하는 선생님께 <span /></p>
+            <h2>감사의 한마디,<br /><em>가득 담은 사랑.</em></h2>
           </motion.div>
           <motion.article className="letter-card" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, amount: 0.18 }} transition={{ duration: 0.9, delay: 0.12 }}>
-            <div className="letter-top"><span>20 / 11</span><span className="letter-flower">✿</span><span>Với tất cả lòng biết ơn</span></div>
-            <div className="letter-copy">
-              {vietnameseMessage.map((paragraph, index) => (
-                <p key={paragraph} className={index === vietnameseMessage.length - 1 ? 'letter-signoff' : ''}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <div className="letter-footer">TỪ NHỮNG HỌC TRÒ NHỎ, VỚI TÌNH YÊU LỚN</div>
+            <div className="letter-top"><span>11월 20일</span><Flower2 className="letter-flower" aria-hidden="true" /><span>감사한 마음을 담아</span></div>
+            <TypingMessage
+              className="letter-copy"
+              paragraphs={gratitudeMessage}
+              finalParagraphClassName="letter-signoff"
+              lang="ko"
+              reduceMotion={shouldReduceMotion}
+              nextSectionId="teachers"
+              onTypingChange={setIsMessageTyping}
+            />
+            <div className="letter-footer">제자들의 작은 마음을 담아</div>
             <SakuraSprig className="letter-sprig" />
           </motion.article>
         </section>
 
-        <section className="scene teachers-scene" id="teachers">
+        <section className="scene teachers-scene" id="teachers" lang="ko">
           <motion.div className="section-intro" initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8 }}>
-            <p className="eyebrow"><span /> NHỮNG NGƯỜI TRUYỀN CẢM HỨNG <span /></p>
-            <h2>Những đóa hoa<br /><em>trong khu vườn tri thức.</em></h2>
-            <p className="section-note">Xin gửi đến thầy cô lời tri ân chân thành nhất.</p>
+            <p className="eyebrow"><span /> 우리에게 영감을 주신 분들 <span /></p>
+            <h2>지식의 정원에 핀<br /><em>소중한 꽃들.</em></h2>
+            <p className="section-note">선생님께 진심 어린 감사의 마음을 전합니다.</p>
           </motion.div>
           <div className="teacher-layout">
             <motion.div ref={teacherArtRef} className="teacher-art" initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.9 }}>
               <motion.div className="teacher-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -8, 0], rotate: [0, 1.2, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}>
-                <Bouquet label="Bó hoa hồng và hoa nhỏ được vẽ minh họa" style={{ x: shouldReduceMotion ? 0 : teacherFlowerX, y: shouldReduceMotion ? 0 : teacherFlowerY, scale: shouldReduceMotion ? 1 : teacherFlowerScale }} />
+                <Bouquet label="감사의 꽃다발" style={{ x: shouldReduceMotion ? 0 : teacherFlowerX, y: shouldReduceMotion ? 0 : teacherFlowerY, scale: shouldReduceMotion ? 1 : teacherFlowerScale }} />
               </motion.div>
-              <span>Thank you<br />for helping us bloom</span>
+                <span>우리의 꿈을 피워 주셔서<br />감사합니다</span>
             </motion.div>
             <div className="teacher-list">
               {teachers.map((teacher, index) => (
                 <motion.article className="teacher-card" key={teacher.name} initial={shouldReduceMotion ? false : { opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.25 }} whileHover={shouldReduceMotion ? undefined : { x: 5, scale: 1.01 }} transition={{ duration: 0.45, delay: index * 0.08 }}>
-                  <span className="teacher-index">0{index + 1}</span>
+                  <span className="teacher-index">{teacher.number}</span>
                   <div><span className="teacher-title">{teacher.title}</span><h3>{teacher.name}</h3></div>
-                  <span className="teacher-star">✳</span>
+                  <Sparkles className="teacher-star" aria-hidden="true" />
                 </motion.article>
               ))}
+            </div>
+          </div>
+          <div className="teacher-moments">
+            <h3>선생님과 함께한 소중한 순간</h3>
+            <div className="teacher-gallery">
+              <figure>
+                <img src="/image/1.jpg" alt="선생님 인물 사진" loading="lazy" />
+                <figcaption>따뜻한 미소로 함께해 주신 선생님</figcaption>
+              </figure>
+              <figure>
+                <img src="/image/2.jpg" alt="선생님들과 함께한 단체 사진" loading="lazy" />
+                <figcaption>함께여서 더욱 빛나는 순간</figcaption>
+              </figure>
+              <figure>
+                <img src="/image/3.jpg" alt="한국어 행사에서 선생님들과 함께한 모습" loading="lazy" />
+                <figcaption>오래도록 간직할 감사의 추억</figcaption>
+              </figure>
             </div>
           </div>
         </section>
@@ -358,7 +455,13 @@ function App() {
             <p className="eyebrow"><span /> 마음을 담아 <span /></p>
             <h2 lang="ko">감사와 존경의<br /><em>마음을 전합니다</em></h2>
             <motion.article className="korean-letter" lang="ko" initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.8, delay: 0.15 }}>
-              {koreanMessage.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              <TypingMessage
+                paragraphs={koreanMessage}
+                lang="ko"
+                reduceMotion={shouldReduceMotion}
+                nextSectionId="finale"
+                onTypingChange={setIsMessageTyping}
+              />
             </motion.article>
             <span className="korean-signature">고맙습니다 · 감사합니다</span>
           </motion.div>
@@ -366,18 +469,18 @@ function App() {
 
         <section className="scene finale-scene" id="finale">
           <motion.div className="finale-content" initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.97 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 1 }}>
-            <p className="eyebrow"><span /> WITH LOVE & GRATITUDE <span /></p>
+            <p className="eyebrow"><span /> 사랑과 감사의 마음을 담아 <span /></p>
             <div className="finale-bloom" ref={finaleArtRef}>
               <motion.div className="finale-flower-float" animate={shouldReduceMotion ? undefined : { y: [0, -9, 0], rotate: [0, -0.8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
-                <Bouquet label="Bó hoa tri ân thầy cô" style={{ x: shouldReduceMotion ? 0 : finaleFlowerX, y: shouldReduceMotion ? 0 : finaleFlowerY, scale: shouldReduceMotion ? 1 : finaleFlowerScale }} />
+                <Bouquet label="선생님께 드리는 감사의 꽃다발" style={{ x: shouldReduceMotion ? 0 : finaleFlowerX, y: shouldReduceMotion ? 0 : finaleFlowerY, scale: shouldReduceMotion ? 1 : finaleFlowerScale }} />
               </motion.div>
             </div>
-            <h2>Happy Vietnamese<br /><em>Teachers' Day</em></h2>
-            <p className="final-date">20 November</p>
-            <p className="final-thanks">Thank you for being our inspiration.<br />With love and gratitude.</p>
-            <motion.button className="replay-button" onClick={() => goToSection(0)} whileHover={shouldReduceMotion ? undefined : { y: -3, scale: 1.03 }} whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }} transition={{ type: 'spring', stiffness: 360, damping: 22 }}>↺ <span>Đọc lại lời chúc</span></motion.button>
+            <h2>선생님, 감사합니다<br /><em>늘 존경하고 사랑합니다</em></h2>
+            <p className="final-date">11월 20일</p>
+            <p className="final-thanks">언제나 우리의 큰 힘이 되어 주셔서 감사합니다.<br />사랑과 존경을 담아.</p>
+            <motion.button className="replay-button" onClick={() => goToSection(0)} whileHover={shouldReduceMotion ? undefined : { y: -3, scale: 1.03 }} whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }} transition={{ type: 'spring', stiffness: 360, damping: 22 }}><RotateCcw aria-hidden="true" /><span>처음부터 다시 보기</span></motion.button>
           </motion.div>
-          <span className="finale-footer">MADE WITH LOVE · 20.11</span>
+          <span className="finale-footer">사랑과 감사의 마음으로 · 11.20</span>
         </section>
       </motion.main>
 
@@ -395,47 +498,41 @@ function App() {
               />
             ))}
           </div>}
-          <motion.div className="opening-petal opening-petal-one" aria-hidden="true" animate={shouldReduceMotion ? undefined : { y: [0, -14, 8, 0], x: [0, 9, -6, 0], rotate: [42, 130, 245, 402] }} transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }} />
-          <motion.div className="opening-petal opening-petal-two" aria-hidden="true" animate={shouldReduceMotion ? undefined : { y: [0, 12, -9, 0], x: [0, -7, 8, 0], rotate: [42, -80, -200, -318] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }} />
+          <motion.div
+            className="opening-flower"
+            aria-hidden="true"
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.92, y: 22 }}
+            animate={isOpening ? { opacity: 0, scale: 1.06, y: -12 } : shouldReduceMotion ? { opacity: [0.94, 1, 0.94] } : { opacity: 1, scale: [1, 1.025, 1], y: [0, -8, 0] }}
+            transition={isOpening ? { duration: 0.7 } : { duration: shouldReduceMotion ? 5 : 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <HeroFlower label="분홍 꽃이 담긴 화병" />
+          </motion.div>
           <motion.div className="opening-card" initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.75, delay: shouldReduceMotion ? 0 : 0.15 }}>
-            <p className="eyebrow"><span /> A LITTLE NOTE FOR YOU <span /></p>
-            <div className="envelope" aria-hidden="true">
-              <motion.div className="envelope-letter" animate={{ y: isOpening ? -38 : 0 }} transition={{ duration: 0.65, delay: isOpening ? 0.2 : 0 }}><span>With love<br />& gratitude</span><i>✿</i></motion.div>
-              <div className="envelope-back" />
-              <div className="envelope-front" />
-              <motion.div className="envelope-flap" animate={{ rotateX: isOpening ? 180 : 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
-              <motion.span className="envelope-seal" animate={{ opacity: isOpening ? 0 : 1, scale: isOpening ? 0.6 : 1 }} transition={{ duration: 0.25 }}>✿</motion.span>
-            </div>
-            <p className="opening-date">20 NOVEMBER</p>
-            <h1>Happy Vietnamese<br /><em>Teachers' Day</em></h1>
-            <p className="opening-caption">Một món quà nhỏ gửi đến những người thầy, người cô tuyệt vời.</p>
-            <motion.button className="open-button" onClick={openCard} disabled={isOpening} whileHover={shouldReduceMotion || isOpening ? undefined : { y: -3, scale: 1.04 }} whileTap={shouldReduceMotion || isOpening ? undefined : { scale: 0.96 }} transition={{ type: 'spring', stiffness: 350, damping: 20 }}>Mở thiệp <span>↗</span></motion.button>
-            <p className="opening-signoff">WITH LOVE & GRATITUDE</p>
-          </motion.div>
-          <motion.div className="opening-bouquet" animate={shouldReduceMotion ? undefined : { y: [0, -12, 0], rotate: [14, 10, 14], scale: [0.98, 1.02, 0.98] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-            <Bouquet />
-          </motion.div>
-          <motion.div className="opening-sprig" animate={shouldReduceMotion ? undefined : { y: [0, 10, 0], rotate: [188, 193, 188], scale: [1, 1.04, 1] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}>
-            <SakuraSprig />
+            <p className="eyebrow"><span /> 사랑과 존경을 담아 <span /></p>
+            <h1>스승의 날<br /><em>감사와 사랑을 담아</em></h1>
+            <p className="opening-date">11월 20일</p>
+            <p className="opening-caption">언제나 우리의 영감이 되어 주신 선생님, 감사합니다.</p>
+            <motion.button className="open-button" onClick={openCard} disabled={isOpening} whileHover={shouldReduceMotion || isOpening ? undefined : { y: -3, scale: 1.04 }} whileTap={shouldReduceMotion || isOpening ? undefined : { scale: 0.96 }} transition={{ type: 'spring', stiffness: 350, damping: 20 }}>{isOpening ? '편지를 여는 중' : '편지 열기'} <ArrowUpRight aria-hidden="true" /></motion.button>
+            <p className="opening-signoff">사랑과 감사의 마음으로</p>
           </motion.div>
         </motion.div>
       )}
       </AnimatePresence>
 
       {isOpen && (
-        <nav className="presentation-bar" aria-label="Điều khiển trình chiếu">
-          <button className="control-icon" onClick={() => goToSection(activeSection - 1)} aria-label="Phân cảnh trước" title="Phân cảnh trước">‹</button>
-          <button className="play-control" onClick={() => setIsPlaying((playing) => !playing)} aria-label={isPlaying ? 'Tạm dừng trình chiếu' : 'Bắt đầu trình chiếu'} title={isPlaying ? 'Tạm dừng' : 'Trình chiếu'}>
-            {isPlaying ? 'Ⅱ' : '▶'}
+        <nav className="presentation-bar" aria-label="편지 장면 제어">
+          <button className="control-icon" onClick={() => goToSection(activeSection - 1)} aria-label="이전 장면" title="이전 장면">‹</button>
+          <button className="play-control" onClick={() => setIsPlaying((playing) => !playing)} aria-label={isPlaying ? '자동 재생 일시 정지' : '자동 재생 시작'} title={isPlaying ? '일시 정지' : '자동 재생'}>
+            {isPlaying ? <Pause aria-hidden="true" /> : <Play aria-hidden="true" />}
           </button>
-          <button className="control-icon" onClick={() => goToSection(activeSection + 1)} aria-label="Phân cảnh tiếp theo" title="Phân cảnh tiếp theo">›</button>
-          <div className="progress-wrap" aria-label={`Phân cảnh ${activeSection + 1} trên ${sections.length}`}>
+          <button className="control-icon" onClick={() => goToSection(activeSection + 1)} aria-label="다음 장면" title="다음 장면">›</button>
+          <div className="progress-wrap" aria-label={`${sections.length}개 장면 중 ${activeSection + 1}번째`}>
             <div className="progress-track"><span style={{ width: `${((activeSection + 1) / sections.length) * 100}%` }} /></div>
             <span className="progress-count">0{activeSection + 1} / 0{sections.length}</span>
           </div>
-          <button className={musicEnabled ? 'control-icon music-control is-active' : 'control-icon music-control'} onClick={() => void toggleMusic()} aria-label={musicEnabled ? 'Tắt nhạc' : 'Bật nhạc'} title={backgroundMusicTitle}>{musicEnabled ? '♫' : '♬'}</button>
-          <button className="control-icon" onClick={() => void toggleFullscreen()} aria-label="Bật hoặc tắt toàn màn hình" title="Toàn màn hình">⛶</button>
-          <button className="control-icon restart-control" onClick={() => { setIsPlaying(false); goToSection(0) }} aria-label="Chạy lại từ đầu" title="Chạy lại">↺</button>
+          <button className={musicEnabled ? 'control-icon music-control is-active' : 'control-icon music-control'} onClick={() => void toggleMusic()} aria-label={musicEnabled ? '음악 끄기' : '음악 켜기'} title={backgroundMusicTitle}><Music2 aria-hidden="true" /></button>
+          <button className="control-icon" onClick={() => void toggleFullscreen()} aria-label="전체 화면 전환" title="전체 화면"><Maximize aria-hidden="true" /></button>
+          <button className="control-icon restart-control" onClick={() => { setIsPlaying(false); goToSection(0) }} aria-label="처음부터 다시 보기" title="처음부터"><RotateCcw aria-hidden="true" /></button>
         </nav>
       )}
 
@@ -446,15 +543,15 @@ function App() {
           musicFallbackAttempted.current = true
           audio.src = backgroundMusicFallbackUrl
           audio.load()
-          setNotice('Bản nhạc trực tuyến không truy cập được; đang thử bản sáo dự phòng.')
+          setNotice('음악을 불러오지 못해 예비 음악을 재생합니다.')
           void audio.play().then(() => setMusicEnabled(true)).catch(() => {
             setMusicEnabled(false)
-            setNotice('Hãy nhấn nút nhạc để phát bản dự phòng.')
+            setNotice('음악 버튼을 눌러 예비 음악을 재생해 주세요.')
           })
           return
         }
         setMusicEnabled(false)
-        setNotice('Không thể tải nhạc nền hoặc bản dự phòng.')
+        setNotice('배경 음악을 불러올 수 없습니다.')
       }} />}
     </>
   )
