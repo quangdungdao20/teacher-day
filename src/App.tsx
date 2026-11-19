@@ -788,7 +788,7 @@ function App() {
                   viewport={{ once: true, amount: 0.12 }}
                   transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={src} alt={alt} loading="lazy" />
+                  <img src={src} alt={alt} />
                   <figcaption>{caption}</figcaption>
                 </motion.figure>
               ))}
