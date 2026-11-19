@@ -40,11 +40,11 @@ const sections = [
 ];
 
 const teachers = [
-  { number: "04", title: "교수님", name: "OH SU YEAN" },
-  { number: "05", title: "교수님", name: "LEE YONG SIK" },
-  { number: "01", title: "교수님", name: "PARK MIYOUNG" },
-  { number: "02", title: "교수님", name: "CHANG MINHEE" },
-  { number: "03", title: "교수님", name: "SEOK SUK HEE" },
+  { number: "01", title: "교수님", name: "OH SU YEAN" },
+  { number: "02", title: "교수님", name: "LEE YONG SIK" },
+  { number: "03", title: "교수님", name: "PARK MIYOUNG" },
+  { number: "04", title: "교수님", name: "CHANG MINHEE" },
+  { number: "05", title: "교수님", name: "SEOK SUK HEE" },
 ];
 
 const gratitudeMessage = [
